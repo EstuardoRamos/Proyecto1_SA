@@ -1,0 +1,26 @@
+services:
+  auth-app:
+    build:
+      context: ..                # contexto en la raíz del repo
+      dockerfile: auth.microservice/Dockerfile
+    environment:
+      # La app leerá estas ENV (ya las pusimos en application.properties con ${...})
+      DB_HOST: auth-db           # importante: nombre del servicio de la DB (están en la misma red)
+      AUTH_DB_PORT: 5432
+      AUTH_DB_USER: auth
+      AUTH_DB_PASS: auth
+      AUTH_DB_NAME: auth
+      JWT_SECRET: super-secreto-de-256-bits-cambialo
+      # opcional:
+      # SERVER_PORT: 8080
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - comerdormir-net          # red del compose raíz
+
+networks:
+  comerdormir-net:
+    external: true               # usa la red ya creada por docker-compose.dev.yml

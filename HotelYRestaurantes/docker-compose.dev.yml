@@ -1,0 +1,166 @@
+services:
+  auth-db:
+    image: postgres:16
+    container_name: auth-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth}
+      POSTGRES_USER: ${AUTH_DB_USER:-auth}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS:-auth}
+    ports:
+      - "${AUTH_DB_PORT:-5434}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${AUTH_DB_NAME:-auth} -U ${AUTH_DB_USER:-auth}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks: [comerdormir-net]
+
+  clients-db:
+    image: postgres:16
+    container_name: clients-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CLI_DB_NAME:-clients}
+      POSTGRES_USER: ${CLI_DB_USER:-clients}
+      POSTGRES_PASSWORD: ${CLI_DB_PASS:-clients}
+    ports:
+      - "${CLI_DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${CLI_DB_NAME:-clients} -U ${CLI_DB_USER:-clients}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - clients_data:/var/lib/postgresql/data
+    networks: [comerdormir-net]
+
+  hotel-db:
+    image: postgres:16
+    container_name: hotel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${HOTEL_DB_NAME:-hotel}
+      POSTGRES_USER: ${HOTEL_DB_USER:-hotel}
+      POSTGRES_PASSWORD: ${HOTEL_DB_PASS:-hotel}
+    ports:
+      - "${HOTEL_DB_PORT:-5435}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${HOTEL_DB_NAME:-hotel} -U ${HOTEL_DB_USER:-hotel}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - hotel_data:/var/lib/postgresql/data
+    networks: [comerdormir-net]
+
+  restaurante-db:
+    image: postgres:16
+    container_name: restaurante-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${RESTAURANTE_DB_NAME:-restaurante}
+      POSTGRES_USER: ${RESTAURANTE_DB_USER:-restaurante}
+      POSTGRES_PASSWORD: ${RESTAURANTE_DB_PASS:-restaurante}
+    ports:
+      - "${RESTUARANTE_DB_PORT:-5436}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${RESTAURANTE_DB_NAME:-restaurante} -U ${RESTAURANTE_DB_USER:-restaurante}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - restaurante_data:/var/lib/postgresql/data
+    networks: [comerdormir-net]
+
+  hotel-app:
+    build:
+      context: ./hotel.microservice      # <— ruta al módulo
+      dockerfile: Dockerfile
+    image: hotel-ms:dev
+    container_name: hotel-app
+    restart: unless-stopped
+    depends_on:
+      hotel-db:
+        condition: service_healthy
+    environment:
+      # DB
+      SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${HOTEL_DB_NAME:-hotel}
+      SPRING_DATASOURCE_USERNAME: ${HOTEL_DB_USER:-hotel}
+      SPRING_DATASOURCE_PASSWORD: ${HOTEL_DB_PASS:-hotel}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Actuator (para healthchecks)
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      SERVER_PORT: 8080
+      # JWT (cuando conectes con Auth; por ahora puede ir comentado)
+      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
+    ports:
+      - "${HOTEL_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [comerdormir-net]
+
+  restaurante-app:
+    build:
+      context: ./restaurante.microservice      # <— ruta al módulo
+      dockerfile: Dockerfile
+    image: restaurante-ms:dev
+    container_name: restaurante-app
+    restart: unless-stopped
+    depends_on:
+      restaurante-db:
+        condition: service_healthy
+    environment:
+      # DB
+      SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${RESTAURANTE_DB_NAME:-restaurante}
+      SPRING_DATASOURCE_USERNAME: ${RESTAURANTE_DB_USER:-restaurante}
+      SPRING_DATASOURCE_PASSWORD: ${RESTAURANTE_DB_PASS:-restaurante}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Actuator (para healthchecks)
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      SERVER_PORT: 8080
+      # JWT (cuando conectes con Auth; por ahora puede ir comentado)
+      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
+    ports:
+      - "${RESTAURANTE_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [comerdormir-net]
+
+  pgadmin:
+    image: dpage/pgadmin4:8.11
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASS:-admin}
+    ports:
+      - "5050:80"        # cambia a 5051:80 si 5050 está ocupado
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - auth-db
+      - clients-db
+      - hotel-db
+      - restaurante-db
+    networks: [comerdormir-net]
+
+networks:
+  comerdormir-net:
+
+volumes:
+  auth_data:
+  clients_data:
+  hotel_data:
+  restaurante_data:
+  pgadmin_data:
