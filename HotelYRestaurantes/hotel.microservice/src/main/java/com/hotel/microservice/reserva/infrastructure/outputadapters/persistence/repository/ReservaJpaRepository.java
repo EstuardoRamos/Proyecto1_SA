@@ -25,4 +25,8 @@ public interface ReservaJpaRepository extends JpaRepository<ReservaDbEntity, UUI
                         @Param("desde") LocalDate desde,
                         @Param("hasta") LocalDate hasta,
                         @Param("estados") List<String> estados);
+
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("update ReservaDbEntity r set r.estado = :estado where r.id = :id")
+  int updateEstado(@Param("id") UUID id, @Param("estado") String estado);
 }

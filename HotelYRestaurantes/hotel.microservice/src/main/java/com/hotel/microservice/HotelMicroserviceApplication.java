@@ -1,5 +1,6 @@
 package com.hotel.microservice;
 
+import com.hotel.microservice.facturacion.application.inputports.EmitirFacturaHotelInputPort;
 import com.hotel.microservice.habitacion.application.inputports.ActualizarHabitacionInputPort;
 import com.hotel.microservice.habitacion.application.inputports.CambiarEstadoHabitacionInputPort;
 import com.hotel.microservice.habitacion.application.inputports.CrearHabitacionInputPort;
@@ -123,8 +124,14 @@ public class HotelMicroserviceApplication {
         return new CheckInUseCase(repo);
     }
 
-    @Bean
-    public CheckOutInputPort checkOutReserva(ReservaRepositorioPort repo) {
-        return new CheckOutUseCase(repo);
+    //@Bean
+    //public CheckOutInputPort checkOutReserva(ReservaRepositorioPort repo) {
+      //  return new CheckOutUseCase(repo);
+    //}
+    
+     @Bean
+    public CheckOutInputPort checkOut(ReservaRepositorioPort reservas,
+            EmitirFacturaHotelInputPort emitir) {
+        return new CheckOutUseCase(reservas, emitir);
     }
 }

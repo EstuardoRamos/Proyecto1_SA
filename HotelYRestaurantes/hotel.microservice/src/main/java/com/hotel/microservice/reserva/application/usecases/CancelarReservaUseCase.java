@@ -7,16 +7,17 @@ import com.hotel.microservice.reserva.application.outputports.ReservaRepositorio
 import java.util.UUID;
 
 public class CancelarReservaUseCase implements CancelarReservaInputPort {
-  private final ReservaRepositorioPort repo;
 
-  public CancelarReservaUseCase(ReservaRepositorioPort repo) {
-    this.repo = repo;
-  }
+    private final ReservaRepositorioPort repo;
 
-  @Override
-  public void cancelar(UUID id) {
-    var r = repo.porId(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
-    r.cancelar();                                  // valida regla de dominio
-    repo.actualizarEstado(id, r.getEstado());      // persistir estado CANCELADA
-  }
+    public CancelarReservaUseCase(ReservaRepositorioPort repo) {
+        this.repo = repo;
+    }
+
+    @Override
+    public void cancelar(UUID id) {
+        var r = repo.porId(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+        r.cancelar();                                  // valida regla de dominio
+        repo.actualizarEstado(id, r.getEstado());      // persistir estado CANCELADA
+    }
 }
