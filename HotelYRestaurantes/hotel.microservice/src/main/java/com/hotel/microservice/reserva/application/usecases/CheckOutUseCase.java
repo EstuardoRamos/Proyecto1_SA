@@ -31,6 +31,6 @@ public class CheckOutUseCase implements CheckOutInputPort {
     reservas.flush();                      // <-- MUY IMPORTANTE: garantiza visibilidad
 
     // ahora sí, la lectura que hace facturación verá CHECKED_OUT
-    emitirFactura.emitir(id, "GTQ", "A", "CF", "Consumidor Final");
+    //emitirFactura.emitir(id, "GTQ", "A", "CF", "Consumidor Final");
   }
 }

@@ -6,6 +6,7 @@ import com.hotel.microservice.facturacion.application.outputports.persistence.Fa
 import com.hotel.microservice.facturacion.domain.FacturaHotel;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class ObtenerFacturaHotelUseCase implements ObtenerFacturaHotelInputPort {
@@ -13,6 +14,7 @@ public class ObtenerFacturaHotelUseCase implements ObtenerFacturaHotelInputPort 
     private final FacturaHotelRepositorioPort facturas;
 
     @Override
+    @Transactional
     public Optional<FacturaHotel> porId(UUID id) {
         return facturas.porId(id);
     }

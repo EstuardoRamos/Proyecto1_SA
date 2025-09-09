@@ -1,6 +1,15 @@
 package com.hotel.microservice;
 
+import com.hotel.microservice.facturacion.application.inputports.AnularFacturaHotelInputPort;
 import com.hotel.microservice.facturacion.application.inputports.EmitirFacturaHotelInputPort;
+import com.hotel.microservice.facturacion.application.inputports.ListarFacturasHotelInputPort;
+import com.hotel.microservice.facturacion.application.inputports.ObtenerFacturaHotelInputPort;
+import com.hotel.microservice.facturacion.application.outputports.persistence.FacturaHotelRepositorioPort;
+import com.hotel.microservice.facturacion.application.outputports.query.ReservaHotelQueryPort;
+import com.hotel.microservice.facturacion.application.usecases.AnularFacturaHotelUseCase;
+import com.hotel.microservice.facturacion.application.usecases.EmitirFacturaHotelUseCase;
+import com.hotel.microservice.facturacion.application.usecases.ListarFacturasHotelUseCase;
+import com.hotel.microservice.facturacion.application.usecases.ObtenerFacturaHotelUseCase;
 import com.hotel.microservice.habitacion.application.inputports.ActualizarHabitacionInputPort;
 import com.hotel.microservice.habitacion.application.inputports.CambiarEstadoHabitacionInputPort;
 import com.hotel.microservice.habitacion.application.inputports.CrearHabitacionInputPort;
@@ -126,12 +135,33 @@ public class HotelMicroserviceApplication {
 
     //@Bean
     //public CheckOutInputPort checkOutReserva(ReservaRepositorioPort repo) {
-      //  return new CheckOutUseCase(repo);
+    //  return new CheckOutUseCase(repo);
     //}
-    
-     @Bean
+    @Bean
     public CheckOutInputPort checkOut(ReservaRepositorioPort reservas,
             EmitirFacturaHotelInputPort emitir) {
         return new CheckOutUseCase(reservas, emitir);
+    }
+
+    //Facturas
+    @Bean
+    public EmitirFacturaHotelInputPort emitirFacturaHotel(FacturaHotelRepositorioPort repo,
+            ReservaHotelQueryPort reservas) {
+        return new EmitirFacturaHotelUseCase(repo, reservas);
+    }
+
+    @Bean
+    public ObtenerFacturaHotelInputPort obtenerFacturaHotel(FacturaHotelRepositorioPort repo) {
+        return new ObtenerFacturaHotelUseCase(repo);
+    }
+
+    @Bean
+    public ListarFacturasHotelInputPort listarFacturasHotel(FacturaHotelRepositorioPort repo) {
+        return new ListarFacturasHotelUseCase(repo);
+    }
+
+    @Bean
+    public AnularFacturaHotelInputPort anularFacturaHotel(FacturaHotelRepositorioPort repo) {
+        return new AnularFacturaHotelUseCase(repo);
     }
 }

@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,19 +24,21 @@ public class FacturaHotelRepositorioOutputAdapter implements FacturaHotelReposit
         return toDomain(saved);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<FacturaHotel> porId(UUID id) {
         return jpa.findById(id).map(FacturaHotelRepositorioOutputAdapter::toDomain);
     }
-
+    @Transactional(readOnly = true)
     @Override
     public Optional<FacturaHotel> porReservaId(UUID reservaId) {
         return jpa.findByReservaId(reservaId).map(FacturaHotelRepositorioOutputAdapter::toDomain);
     }
 
     @Override
-    public java.util.List<FacturaHotel> listar(UUID hotelId, java.time.Instant desde, java.time.Instant hasta) {
-        return jpa.listar(hotelId, desde, hasta).stream().map(FacturaHotelRepositorioOutputAdapter::toDomain).toList();
+     @Transactional(readOnly = true)
+    public List<FacturaHotel> listar(UUID hotelId) {
+        return jpa.listar(hotelId).stream().map(FacturaHotelRepositorioOutputAdapter::toDomain).toList();
     }
 
     @Override

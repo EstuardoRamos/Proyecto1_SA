@@ -14,9 +14,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.List;
 
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reservas")
 public class ReservaControllerAdapter {
@@ -70,11 +72,11 @@ public class ReservaControllerAdapter {
             }
     )
     @GetMapping
-    public Page<ReservaResponse> listar(
+    public List<ReservaResponse> listar(
             @Parameter(description = "ID del hotel") @RequestParam UUID hotelId,
             @Parameter(description = "Página (0..N)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Tamaño de página") @RequestParam(defaultValue = "20") int size) {
-        return listar.listar(hotelId, PageRequest.of(page, size)).map(ReservaControllerAdapter::toResp);
+        return listar.listar(hotelId, PageRequest.of(page, size)).map(ReservaControllerAdapter::toResp).getContent();
     }
 
     /**
@@ -97,6 +99,8 @@ public class ReservaControllerAdapter {
 
     /**
      * Cancela una reserva (cambio de estado a CANCELADA).
+     * @param id
+     * @return 
      */
     @Operation(
             summary = "Cancelar reserva",
@@ -107,12 +111,16 @@ public class ReservaControllerAdapter {
             }
     )
     @PatchMapping("/{id}/cancelar")
-    public void cancelar(@Parameter(description = "ID de la reserva") @PathVariable UUID id) {
+    public ReservaResponse cancelar(@Parameter(description = "ID de la reserva") @PathVariable UUID id) {
         cancelar.cancelar(id);
+        var r = obtener.obtener(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+        return toResp(r); 
     }
 
     /**
      * Realiza el check-in de la reserva (transición de estado).
+     * @param id
+     * @return 
      */
     @Operation(
             summary = "Check-in de reserva",
@@ -124,13 +132,17 @@ public class ReservaControllerAdapter {
             }
     )
     @PostMapping("/{id}/checkin")
-    public void checkIn(@Parameter(description = "ID de la reserva") @PathVariable UUID id) {
+    public ReservaResponse checkIn(@PathVariable UUID id) {
         checkIn.checkIn(id);
+        var r = obtener.obtener(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+        return toResp(r); // <-- cuerpo JSON con la reserva (estado CHECKED_IN)
     }
 
     /**
      * Realiza el check-out de la reserva (transición de estado). Puede disparar
      * facturación.
+     * @param id
+     * @return 
      */
     @Operation(
             summary = "Check-out de reserva",
@@ -143,8 +155,10 @@ public class ReservaControllerAdapter {
             }
     )
     @PostMapping("/{id}/checkout")
-    public void checkOut(@Parameter(description = "ID de la reserva") @PathVariable UUID id) {
+    public ReservaResponse checkOut(@Parameter(description = "ID de la reserva") @PathVariable UUID id) {
         checkOut.checkOut(id);
+        var r = obtener.obtener(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+        return toResp(r);
     }
 
     private static ReservaResponse toResp(Reserva r) {

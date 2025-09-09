@@ -6,6 +6,7 @@ import com.hotel.microservice.facturacion.domain.FacturaHotel;
 import java.time.Instant;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class ListarFacturasHotelUseCase implements ListarFacturasHotelInputPort {
@@ -13,7 +14,8 @@ public class ListarFacturasHotelUseCase implements ListarFacturasHotelInputPort 
     private final FacturaHotelRepositorioPort facturas;
 
     @Override
-    public java.util.List<FacturaHotel> listar(UUID hotelId, Instant desde, Instant hasta) {
-        return facturas.listar(hotelId, desde, hasta);
+    @Transactional
+    public List<FacturaHotel> listar(UUID hotelId) {
+        return facturas.listar(hotelId);
     }
 }

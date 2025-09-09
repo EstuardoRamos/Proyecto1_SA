@@ -20,5 +20,6 @@ public interface ReservaRepositorioPort {
     boolean existeTraslape(UUID habitacionId, LocalDate in, LocalDate out, Set<Reserva.Estado> estados);
 
     void actualizarEstado(UUID id, Reserva.Estado estado);
+    
     void flush();
 }

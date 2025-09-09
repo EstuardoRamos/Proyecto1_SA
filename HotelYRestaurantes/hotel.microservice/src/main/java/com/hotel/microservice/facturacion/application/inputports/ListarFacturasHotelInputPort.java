@@ -6,5 +6,5 @@ import java.util.*;
 
 public interface ListarFacturasHotelInputPort {
 
-    java.util.List<FacturaHotel> listar(java.util.UUID hotelId, Instant desde, Instant hasta);
+    List<FacturaHotel> listar(UUID hotelId);
 }

@@ -5,6 +5,7 @@ import com.hotel.microservice.reserva.application.inputports.CancelarReservaInpu
 import com.hotel.microservice.reserva.application.outputports.ReservaRepositorioPort;
 
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 public class CancelarReservaUseCase implements CancelarReservaInputPort {
 
@@ -15,6 +16,7 @@ public class CancelarReservaUseCase implements CancelarReservaInputPort {
     }
 
     @Override
+    @Transactional
     public void cancelar(UUID id) {
         var r = repo.porId(id).orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
         r.cancelar();                                  // valida regla de dominio

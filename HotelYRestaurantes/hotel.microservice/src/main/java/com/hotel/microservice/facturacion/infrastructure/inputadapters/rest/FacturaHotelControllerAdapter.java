@@ -9,6 +9,7 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/facturas/hotel")
 @RequiredArgsConstructor
@@ -40,10 +41,8 @@ public class FacturaHotelControllerAdapter {
 
     @Operation(summary = "Listar facturas de hotel por hotel y rango (devuelve solo arreglo)")
     @GetMapping
-    public java.util.List<FacturaHotelResponse> listar(@RequestParam UUID hotelId,
-            @RequestParam(required = false) Instant desde,
-            @RequestParam(required = false) Instant hasta) {
-        return listar.listar(hotelId, desde, hasta).stream().map(FacturaHotelResponse::from).toList();
+    public java.util.List<FacturaHotelResponse> listar(@RequestParam UUID hotelId) {
+        return listar.listar(hotelId).stream().map(FacturaHotelResponse::from).toList();
     }
 
     @Operation(summary = "Anular factura de hotel") // opcional
