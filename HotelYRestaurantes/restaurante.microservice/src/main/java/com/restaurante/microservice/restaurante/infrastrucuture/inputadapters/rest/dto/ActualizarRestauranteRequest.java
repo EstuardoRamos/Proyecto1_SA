@@ -12,4 +12,5 @@ public record ActualizarRestauranteRequest(
   @Size(max=400) String direccion,
   @NotNull @DecimalMin("0.0") @DecimalMax("1.0") BigDecimal impuestoPorc,
   @NotNull @DecimalMin("0.0") @DecimalMax("1.0") BigDecimal propinaPorcDefault
+  
 ) {}

@@ -4,6 +4,7 @@ import com.restaurante.microservice.restaurante.application.inputoports.Actualiz
 import com.restaurante.microservice.restaurante.application.inputoports.CrearRestauranteInputPort;
 import com.restaurante.microservice.restaurante.application.inputoports.DeshabilitarRestauranteInputPort;
 import com.restaurante.microservice.restaurante.application.inputoports.DesvincularHotelInputPort;
+import com.restaurante.microservice.restaurante.application.inputoports.HabilitarRestauranteInputPort;
 import com.restaurante.microservice.restaurante.application.inputoports.ListarRestaurantesInputPort;
 import com.restaurante.microservice.restaurante.application.inputoports.ObtenerRestauranteInputPort;
 import com.restaurante.microservice.restaurante.application.inputoports.VincularHotelInputPort;
@@ -12,6 +13,7 @@ import com.restaurante.microservice.restaurante.application.usecases.ActualizarR
 import com.restaurante.microservice.restaurante.application.usecases.CrearRestauranteUseCase;
 import com.restaurante.microservice.restaurante.application.usecases.DeshabilitarRestauranteUseCase;
 import com.restaurante.microservice.restaurante.application.usecases.DesvincularHotelUseCase;
+import com.restaurante.microservice.restaurante.application.usecases.HabilitarRestauranteUseCase;
 import com.restaurante.microservice.restaurante.application.usecases.ListarRestaurantesUseCase;
 import com.restaurante.microservice.restaurante.application.usecases.ObtenerRestauranteUseCase;
 import com.restaurante.microservice.restaurante.application.usecases.VincularHotelUseCase;
@@ -63,7 +65,11 @@ public class Application {
         return new DesvincularHotelUseCase(repo);
     }
     
-    
+    // infrastructure/config/RestauranteBeansConfig.java
+    @Bean
+    public HabilitarRestauranteInputPort habilitarRestaurante(RestauranteRepositorioPort repo) {
+    return new HabilitarRestauranteUseCase(repo);
+    }
     
 
 }

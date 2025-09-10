@@ -8,10 +8,12 @@ import com.restaurante.microservice.facturacion.infraestructure.inputadapters.re
 //import com.restaurante.microservice.facturacion.infrastructure.inputadapters.rest.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/facturas/restaurantes")
 @RequiredArgsConstructor
@@ -43,10 +45,27 @@ public class FacturaControllerAdapter {
 
     @Operation(summary = "Listar facturas por restaurante y rango (devuelve solo arreglo)")
     @GetMapping
-    public List<FacturaResponse> listar(@RequestParam UUID restauranteId,
-            @RequestParam(required = false) Instant desde,
-            @RequestParam(required = false) Instant hasta) {
-        return listar.listar(restauranteId, desde, hasta).stream().map(FacturaResponse::from).toList();
+    public List<FacturaResponse> listar(
+            @RequestParam(required = false) UUID restauranteId, // opcional: si viene null, lista todas
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
+        // Convertimos LocalDate -> Instant (inicio y fin de día, inclusivo)
+        java.time.Instant d = (desde == null)
+                ? null
+                : desde.atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+
+        java.time.Instant h = (hasta == null)
+                ? null
+                : hasta.plusDays(1).atStartOfDay(java.time.ZoneOffset.UTC).toInstant().minusNanos(1);
+
+        return listar
+                .listar(restauranteId, d, h) // tu use case/servicio espera Instant
+                .stream()
+                .map(FacturaResponse::from)
+                .toList();
     }
 
     @Operation(summary = "Anular factura") // opcional

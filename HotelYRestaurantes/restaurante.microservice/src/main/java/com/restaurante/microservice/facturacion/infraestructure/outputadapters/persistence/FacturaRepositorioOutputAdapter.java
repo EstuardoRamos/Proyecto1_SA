@@ -6,9 +6,11 @@ import com.restaurante.microservice.facturacion.domain.*;
 import com.restaurante.microservice.facturacion.infraestructure.outputadapters.persistence.entity.FacturaItemRestDbEntity;
 import com.restaurante.microservice.facturacion.infraestructure.outputadapters.persistence.entity.FacturaRestDbEntity;
 import com.restaurante.microservice.facturacion.infraestructure.outputadapters.persistence.repository.FacturaRestJpaRepository;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -35,8 +37,10 @@ public class FacturaRepositorioOutputAdapter implements FacturaRepositorioPort {
     }
 
     @Override
-    public List<Factura> listar(UUID restauranteId, java.time.Instant desde, java.time.Instant hasta) {
-        return jpa.listar(restauranteId, desde, hasta).stream().map(FacturaRepositorioOutputAdapter::toDomain).toList();
+    public List<Factura> listar(UUID restauranteId, Instant desde, Instant hasta) {
+        return jpa.listar(restauranteId, desde, hasta, Pageable.unpaged())
+                .map(FacturaRepositorioOutputAdapter::toDomain) 
+                .getContent();
     }
 
     @Override

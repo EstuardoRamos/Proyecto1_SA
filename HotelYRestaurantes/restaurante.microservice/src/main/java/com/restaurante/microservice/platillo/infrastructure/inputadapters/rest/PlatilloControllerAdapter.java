@@ -5,11 +5,13 @@ import com.restaurante.microservice.platillo.infrastructure.inputadapters.rest.d
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 
 @Tag(name = "Platillos", description = "CRUD de platillos de restaurante")
 @RestController
@@ -47,7 +49,7 @@ public class PlatilloControllerAdapter {
 
     @Operation(summary = "Listar / buscar platillos")
     @GetMapping
-    public PagePlatilloResponse<PlatilloResponse> listar(
+    public List<PlatilloResponse> listar(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) UUID restauranteId,
             @RequestParam(required = false) Boolean enabled,
@@ -55,11 +57,19 @@ public class PlatilloControllerAdapter {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String sort
     ) {
-        Pageable pageable = (sort == null || sort.isBlank())
-                ? PageRequest.of(page, size)
-                : PageRequest.of(page, size, Sort.by(Sort.Order.by(sort)));
-        var res = listar.listar(q, restauranteId, enabled, pageable).map(PlatilloControllerAdapter::toResponse);
-        return PagePlatilloResponse.from(res);
+        // soporta sort asc y "-campo" para desc
+        Sort sortSpec = Sort.unsorted();
+        if (sort != null && !sort.isBlank()) {
+            sortSpec = sort.startsWith("-")
+                    ? Sort.by(Sort.Order.desc(sort.substring(1)))
+                    : Sort.by(Sort.Order.asc(sort));
+        }
+
+        var pageable = PageRequest.of(page, size, sortSpec);
+
+        return listar.listar(q, restauranteId, enabled, pageable)
+                .map(PlatilloControllerAdapter::toResponse) // Page<PlatilloResponse>
+                .getContent();                               // List<PlatilloResponse>
     }
 
     @Operation(summary = "Actualizar platillo")

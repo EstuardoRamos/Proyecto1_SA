@@ -16,47 +16,55 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PlatilloRepositorioOutputAdapter implements PlatilloRepositorioOutputPort {
 
-  private final PlatilloJpaRepository jpa;
+    private final PlatilloJpaRepository jpa;
 
-  private static Platillo toDomain(PlatilloDbEntity e){
-    return Platillo.builder()
-        .id(e.getId())
-        .restauranteId(e.getRestauranteId())
-        .nombre(e.getNombre())
-        .descripcion(e.getDescripcion())
-        .precio(e.getPrecio())
-        .imagenUrl(e.getImagenUrl())
-        .disponible(e.isDisponible())
-        .enabled(e.isEnabled())
-        .createdAt(e.getCreatedAt())
-        .updatedAt(e.getUpdatedAt())
-        .build();
-  }
+    private static Platillo toDomain(PlatilloDbEntity e) {
+        return Platillo.builder()
+                .id(e.getId())
+                .restauranteId(e.getRestauranteId())
+                .nombre(e.getNombre())
+                .descripcion(e.getDescripcion())
+                .precio(e.getPrecio())
+                .imagenUrl(e.getImagenUrl())
+                .disponible(e.isDisponible())
+                .enabled(e.isEnabled())
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
+                .build();
+    }
 
-  private static PlatilloDbEntity toEntity(Platillo d){
-    return PlatilloDbEntity.builder()
-        .id(d.getId())
-        .restauranteId(d.getRestauranteId())
-        .nombre(d.getNombre())
-        .descripcion(d.getDescripcion())
-        .precio(d.getPrecio())
-        .imagenUrl(d.getImagenUrl())
-        .disponible(d.isDisponible())
-        .enabled(d.isEnabled())
-        .createdAt(d.getCreatedAt())
-        .updatedAt(d.getUpdatedAt())
-        .build();
-  }
+    private static PlatilloDbEntity toEntity(Platillo d) {
+        return PlatilloDbEntity.builder()
+                .id(d.getId())
+                .restauranteId(d.getRestauranteId())
+                .nombre(d.getNombre())
+                .descripcion(d.getDescripcion())
+                .precio(d.getPrecio())
+                .imagenUrl(d.getImagenUrl())
+                .disponible(d.isDisponible())
+                .enabled(d.isEnabled())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
+                .build();
+    }
 
-  @Override public Platillo save(Platillo p){ return toDomain(jpa.save(toEntity(p))); }
+    @Override
+    public Platillo save(Platillo p) {
+        return toDomain(jpa.save(toEntity(p)));
+    }
 
-  @Override public Optional<Platillo> findById(UUID id){ return jpa.findById(id).map(PlatilloRepositorioOutputAdapter::toDomain); }
+    @Override
+    public Optional<Platillo> findById(UUID id) {
+        return jpa.findById(id).map(PlatilloRepositorioOutputAdapter::toDomain);
+    }
 
-  @Override public boolean existsByNombreInRestaurante(UUID restauranteId, String nombre){
-    return jpa.existsByNombreInRestaurante(restauranteId, nombre);
-  }
+    @Override
+    public boolean existsByNombreInRestaurante(UUID restauranteId, String nombre) {
+        return jpa.existsByNombreInRestaurante(restauranteId, nombre);
+    }
 
-  @Override public Page<Platillo> list(String q, UUID restauranteId, Boolean enabled, Pageable pageable){
-    return jpa.search(q, restauranteId, enabled, pageable).map(PlatilloRepositorioOutputAdapter::toDomain);
-  }
+    @Override
+    public Page<Platillo> list(String q, UUID restauranteId, Boolean enabled, Pageable pageable) {
+        return jpa.searchByPattern(q, restauranteId, enabled, pageable).map(PlatilloRepositorioOutputAdapter::toDomain);
+    }
 }
