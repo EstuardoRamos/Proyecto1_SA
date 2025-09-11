@@ -75,6 +75,59 @@ services:
       - restaurante_data:/var/lib/postgresql/data
     networks: [comerdormir-net]
 
+
+reviews-db:
+    image: postgres:16
+    container_name: reviews-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${REVIEWS_DB_NAME:-reviews}
+      POSTGRES_USER: ${REVIEWS_DB_USER:-reviews}
+      POSTGRES_PASSWORD: ${REVIEWS_DB_PASS:-reviews}
+    ports:
+      - "${RESTUARANTE_DB_PORT:-5437}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${REVIEWS_DB_NAME:-reviews} -U ${REVIEWS_DB_USER:-reviews}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - reviews_data:/var/lib/postgresql/data
+    networks: [comerdormir-net]
+
+
+reviews-app:
+  build:
+    context: ./reviews.microservice      # <— ruta al módulo
+    dockerfile: Dockerfile
+  image: reviews-ms:dev
+  container_name: reviews-app
+  restart: unless-stopped
+  depends_on:
+    reviews-db:
+      condition: service_healthy
+  environment:
+    # DB
+    SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${REVIEWS_DB_NAME:-reviews}
+    SPRING_DATASOURCE_USERNAME: ${REVIEWS_DB_USER:-reviews}
+    SPRING_DATASOURCE_PASSWORD: ${REVIEWS_DB_PASS:-reviews}
+    SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    # Actuator (para healthchecks)
+    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+    SERVER_PORT: 8080
+    # JWT (cuando conectes con Auth; por ahora puede ir comentado)
+    # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
+  ports:
+    - "${REVIEWS_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
+  healthcheck:
+    test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+    interval: 10s
+    timeout: 3s
+    retries: 15
+  networks: [comerdormir-net]
+    
+
   hotel-app:
     build:
       context: ./hotel.microservice      # <— ruta al módulo

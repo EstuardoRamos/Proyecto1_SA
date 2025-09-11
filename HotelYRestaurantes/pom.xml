@@ -9,6 +9,7 @@
         <module>auth.microservice</module>
         <module>hotel.microservice</module>
         <module>restaurante.microservice</module>
+        <module>reviews.microservice</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
