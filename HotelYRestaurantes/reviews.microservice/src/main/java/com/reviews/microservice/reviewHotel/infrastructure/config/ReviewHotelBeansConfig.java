@@ -35,8 +35,6 @@ public class ReviewHotelBeansConfig {
         return http;
     }
 
-    
-
     // Si luego quieres el HTTP real, crea otro bean (sin @Primary) o bajo un profile.
     // @Bean
     // public FacturacionQueryPort facturacionHttp(FacturacionHttpAdapter http){ return http; }
@@ -54,5 +52,31 @@ public class ReviewHotelBeansConfig {
     @Bean
     public ObtenerPromedioHotelInputPort obtenerPromedioHotel(ReviewHotelRepositorioPort repo) {
         return new ObtenerPromedioHotelUseCase(repo);
+    }
+
+    @Bean
+    public ObtenerReviewHotelInputPort obtenerReviewHotel(ReviewHotelRepositorioPort repo) {
+        return new ObtenerReviewHotelUseCase(repo);
+    }
+
+
+    @Bean
+    public ResumenReviewsHotelInputPort resumenReviewsHotel(ReviewHotelRepositorioPort repo) {
+        return new ResumenReviewsHotelUseCase(repo);
+    }
+
+    @Bean
+    public TopReviewsHotelInputPort topReviewsHotel(ReviewHotelRepositorioPort repo) {
+        return new TopReviewsHotelUseCase(repo);
+    }
+
+    @Bean
+    public HabilitarReviewHotelInputPort habilitarReviewHotel(ReviewHotelRepositorioPort repo) {
+        return new HabilitarReviewHotelUseCase(repo);
+    }
+
+    @Bean
+    public DeshabilitarReviewHotelInputPort deshabilitarReviewHotel(ReviewHotelRepositorioPort repo) {
+        return new DeshabilitarReviewHotelUseCase(repo);
     }
 }
