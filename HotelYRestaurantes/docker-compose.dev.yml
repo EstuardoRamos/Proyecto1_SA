@@ -65,7 +65,7 @@ services:
       POSTGRES_USER: ${RESTAURANTE_DB_USER:-restaurante}
       POSTGRES_PASSWORD: ${RESTAURANTE_DB_PASS:-restaurante}
     ports:
-      - "${RESTUARANTE_DB_PORT:-5436}:5432"
+      - "${RESTAURANTE_DB_PORT:-5436}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${RESTAURANTE_DB_NAME:-restaurante} -U ${RESTAURANTE_DB_USER:-restaurante}"]
       interval: 5s
@@ -75,8 +75,7 @@ services:
       - restaurante_data:/var/lib/postgresql/data
     networks: [comerdormir-net]
 
-
-reviews-db:
+  reviews-db:
     image: postgres:16
     container_name: reviews-db
     restart: unless-stopped
@@ -85,7 +84,7 @@ reviews-db:
       POSTGRES_USER: ${REVIEWS_DB_USER:-reviews}
       POSTGRES_PASSWORD: ${REVIEWS_DB_PASS:-reviews}
     ports:
-      - "${RESTUARANTE_DB_PORT:-5437}:5432"
+      - "${REVIEWS_DB_PORT:-5437}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${REVIEWS_DB_NAME:-reviews} -U ${REVIEWS_DB_USER:-reviews}"]
       interval: 5s
@@ -95,42 +94,9 @@ reviews-db:
       - reviews_data:/var/lib/postgresql/data
     networks: [comerdormir-net]
 
-
-reviews-app:
-  build:
-    context: ./reviews.microservice      # <— ruta al módulo
-    dockerfile: Dockerfile
-  image: reviews-ms:dev
-  container_name: reviews-app
-  restart: unless-stopped
-  depends_on:
-    reviews-db:
-      condition: service_healthy
-  environment:
-    # DB
-    SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${REVIEWS_DB_NAME:-reviews}
-    SPRING_DATASOURCE_USERNAME: ${REVIEWS_DB_USER:-reviews}
-    SPRING_DATASOURCE_PASSWORD: ${REVIEWS_DB_PASS:-reviews}
-    SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    # Actuator (para healthchecks)
-    MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
-    MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
-    SERVER_PORT: 8080
-    # JWT (cuando conectes con Auth; por ahora puede ir comentado)
-    # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
-  ports:
-    - "${REVIEWS_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
-  healthcheck:
-    test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
-    interval: 10s
-    timeout: 3s
-    retries: 15
-  networks: [comerdormir-net]
-    
-
   hotel-app:
     build:
-      context: ./hotel.microservice      # <— ruta al módulo
+      context: ./hotel.microservice
       dockerfile: Dockerfile
     image: hotel-ms:dev
     container_name: hotel-app
@@ -139,21 +105,17 @@ reviews-app:
       hotel-db:
         condition: service_healthy
     environment:
-      # DB
       SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${HOTEL_DB_NAME:-hotel}
       SPRING_DATASOURCE_USERNAME: ${HOTEL_DB_USER:-hotel}
       SPRING_DATASOURCE_PASSWORD: ${HOTEL_DB_PASS:-hotel}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      # Actuator (para healthchecks)
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
       MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
       SERVER_PORT: 8080
-      # JWT (cuando conectes con Auth; por ahora puede ir comentado)
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
     ports:
-      - "${HOTEL_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
+      - "${HOTEL_APP_PORT:-8082}:8080"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
       timeout: 3s
       retries: 15
@@ -161,7 +123,7 @@ reviews-app:
 
   restaurante-app:
     build:
-      context: ./restaurante.microservice      # <— ruta al módulo
+      context: ./restaurante.microservice
       dockerfile: Dockerfile
     image: restaurante-ms:dev
     container_name: restaurante-app
@@ -170,21 +132,48 @@ reviews-app:
       restaurante-db:
         condition: service_healthy
     environment:
-      # DB
-      SPRING_DATASOURCE_URL: jdbc:postgresql://hotel-db:5432/${RESTAURANTE_DB_NAME:-restaurante}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://restaurante-db:5432/${RESTAURANTE_DB_NAME:-restaurante}
       SPRING_DATASOURCE_USERNAME: ${RESTAURANTE_DB_USER:-restaurante}
       SPRING_DATASOURCE_PASSWORD: ${RESTAURANTE_DB_PASS:-restaurante}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      # Actuator (para healthchecks)
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
       MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
       SERVER_PORT: 8080
-      # JWT (cuando conectes con Auth; por ahora puede ir comentado)
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-app:8080/.well-known/jwks.json
     ports:
-      - "${RESTAURANTE_APP_PORT:-8081}:8080"   # evita chocar con el auth en 8080
+      - "${RESTAURANTE_APP_PORT:-8083}:8080"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [comerdormir-net]
+
+  reviews-app:
+    build:
+      context: ./reviews.microservice
+      dockerfile: Dockerfile
+    image: reviews-ms:dev
+    container_name: reviews-app
+    restart: unless-stopped
+    depends_on:
+      reviews-db:
+        condition: service_healthy
+      hotel-app:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://reviews-db:5432/${REVIEWS_DB_NAME:-reviews}
+      SPRING_DATASOURCE_USERNAME: ${REVIEWS_DB_USER:-reviews}
+      SPRING_DATASOURCE_PASSWORD: ${REVIEWS_DB_PASS:-reviews}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      SERVER_PORT: 8080
+      # Base URL del MS Hotel para consultar facturas (usa service discovery via docker network)
+      HOTEL_API_BASE_URL: http://hotel-app:8080
+    ports:
+      - "${REVIEWS_APP_PORT:-8084}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
       timeout: 3s
       retries: 15
@@ -198,7 +187,7 @@ reviews-app:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASS:-admin}
     ports:
-      - "5050:80"        # cambia a 5051:80 si 5050 está ocupado
+      - "5050:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
@@ -206,6 +195,7 @@ reviews-app:
       - clients-db
       - hotel-db
       - restaurante-db
+      - reviews-db
     networks: [comerdormir-net]
 
 networks:
@@ -216,4 +206,5 @@ volumes:
   clients_data:
   hotel_data:
   restaurante_data:
+  reviews_data:
   pgadmin_data:
