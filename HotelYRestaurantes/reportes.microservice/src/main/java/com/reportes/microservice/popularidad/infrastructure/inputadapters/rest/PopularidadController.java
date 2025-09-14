@@ -16,7 +16,9 @@ import com.reportes.microservice.popularidad.application.inputports.CalcularHabi
 import com.reportes.microservice.popularidad.application.inputports.CalcularRestauranteMasPopularPort;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reportes/popular")
 public class PopularidadController {
