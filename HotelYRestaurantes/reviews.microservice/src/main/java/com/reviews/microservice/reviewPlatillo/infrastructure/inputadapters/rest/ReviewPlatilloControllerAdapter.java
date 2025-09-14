@@ -25,7 +25,9 @@ import com.reviews.microservice.reviewPlatillo.infrastructure.inputadapters.rest
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reviews/platillos")
 @RequiredArgsConstructor
@@ -36,6 +38,8 @@ public class ReviewPlatilloControllerAdapter {
   private final ListarReviewsPlatilloInputPort listar;
   private final ResumenReviewsPlatilloInputPort resumen;
 
+
+  
   @PostMapping
   public ReviewPlatilloResponse crear(@Valid @RequestBody CrearReviewPlatilloRequest req){
     var r = crear.crear(req.cuentaId(), req.platilloId(), req.estrellas(), req.comentario());
