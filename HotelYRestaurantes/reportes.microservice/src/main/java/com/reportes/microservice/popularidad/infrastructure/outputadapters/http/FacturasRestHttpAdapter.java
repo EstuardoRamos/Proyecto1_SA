@@ -55,8 +55,7 @@ public class FacturasRestHttpAdapter implements FacturasRestQueryPort {
     );
   }
 
-  // DTO para deserializar la respuesta del MS de Restaurantes
-  // (usa los mismos nombres que devuelve tu endpoint /v1/facturas/restaurantes)
+
   static final class FacturaDto {
     public UUID id;
     public UUID restauranteId;

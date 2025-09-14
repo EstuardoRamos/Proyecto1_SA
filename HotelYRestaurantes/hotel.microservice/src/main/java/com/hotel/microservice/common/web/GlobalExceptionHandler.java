@@ -1,21 +1,27 @@
 package com.hotel.microservice.common.web;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import jakarta.validation.ConstraintViolationException;
-import org.springframework.http.*;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import jakarta.validation.ConstraintViolationException;
 
 //@RestControllerAdvice
 @ControllerAdvice(basePackages = "com.hotel.microservice")
 public class GlobalExceptionHandler {
 
-  // Bean Validation en @RequestBody (@Valid)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String,Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
     Map<String, String> fields = ex.getBindingResult().getFieldErrors()

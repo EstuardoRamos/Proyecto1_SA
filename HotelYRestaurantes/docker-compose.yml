@@ -18,24 +18,6 @@ services:
       - auth_data:/var/lib/postgresql/data
     networks: [comerdormir-net]
 
-  clients-db:
-    image: postgres:16
-    container_name: clients-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${CLI_DB_NAME:-clients}
-      POSTGRES_USER: ${CLI_DB_USER:-clients}
-      POSTGRES_PASSWORD: ${CLI_DB_PASS:-clients}
-    ports:
-      - "${CLI_DB_PORT:-5433}:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d ${CLI_DB_NAME:-clients} -U ${CLI_DB_USER:-clients}"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-    volumes:
-      - clients_data:/var/lib/postgresql/data
-    networks: [comerdormir-net]
 
   hotel-db:
     image: postgres:16
@@ -94,8 +76,6 @@ services:
       - reviews_data:/var/lib/postgresql/data
     networks: [comerdormir-net]
 
-
-
   user-db:
       image: postgres:16
       container_name: user-db
@@ -135,7 +115,7 @@ services:
         MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
         SERVER_PORT: 8080
       ports:
-        - "${USER_APP_PORT:-8083}:8080"
+        - "${USER_APP_PORT:-8085}:8080"
       healthcheck:
         test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
         interval: 10s
@@ -164,7 +144,7 @@ services:
       SPRINGDOC_SWAGGER_UI_CONFIG_URL: /api/hotel/v3/api-docs/swagger-config
       SERVER_PORT: 8080
     ports:
-      - "${HOTEL_APP_PORT:-8081}:8080"
+      - "${HOTEL_APP_PORT:-8082}:8080"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
@@ -233,6 +213,39 @@ services:
       timeout: 3s
       retries: 15
     networks: [comerdormir-net]
+  reportes-app:
+    build:
+      context: ./reportes.microservice
+      dockerfile: Dockerfile
+    image: reportes-ms:dev
+    container_name: reportes-app
+    restart: unless-stopped
+    # depends_on eliminado porque no hay DB
+    environment:
+      # Evita autoconfiguración de JDBC/JPA si tienes starters en el classpath
+      SPRING_AUTOCONFIGURE_EXCLUDE: >
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,
+        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+      # Actuator (para el healthcheck)
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+
+      # Swagger (ajusta si tu path cambia)
+      SPRINGDOC_SWAGGER_UI_URL: /api/rest/v3/api-docs
+      SPRINGDOC_SWAGGER_UI_CONFIG_URL: /api/rest/v3/api-docs/swagger-config
+
+      # Puerto interno del contenedor (mantén 8080 si así corre tu app)
+      SERVER_PORT: 8080
+    ports:
+      - "${REPORTES_APP_PORT:-8089}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [comerdormir-net]
+
 
   pgadmin:
     image: dpage/pgadmin4:8.11
@@ -248,7 +261,6 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - auth-db
-      - clients-db
       - hotel-db
       - restaurante-db
       - reviews-db
@@ -260,7 +272,6 @@ networks:
 
 volumes:
   auth_data:
-  clients_data:
   hotel_data:
   restaurante_data:
   reviews_data:

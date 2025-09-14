@@ -1,5 +1,9 @@
 package com.hotel.microservice;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
 import com.hotel.microservice.facturacion.application.inputports.AnularFacturaHotelInputPort;
 import com.hotel.microservice.facturacion.application.inputports.EmitirFacturaHotelInputPort;
 import com.hotel.microservice.facturacion.application.inputports.ListarFacturasHotelInputPort;
@@ -23,9 +27,17 @@ import com.hotel.microservice.habitacion.application.usecases.CrearHabitacionUse
 import com.hotel.microservice.habitacion.application.usecases.EliminarHabitacionUseCase;
 import com.hotel.microservice.habitacion.application.usecases.ListarHabitacionesUseCase;
 import com.hotel.microservice.habitacion.application.usecases.ObtenerHabitacionUseCase;
-import com.hotel.microservice.hotel.application.inputports.*;
+import com.hotel.microservice.hotel.application.inputports.ActualizarHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.CrearHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.EliminarHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.ListarHotelesInputPort;
+import com.hotel.microservice.hotel.application.inputports.ObtenerHotelInputPort;
 import com.hotel.microservice.hotel.application.outputports.HotelRepositorioPort;
-import com.hotel.microservice.hotel.application.usecases.*;
+import com.hotel.microservice.hotel.application.usecases.ActualizarHotelUseCase;
+import com.hotel.microservice.hotel.application.usecases.CrearHotelUseCase;
+import com.hotel.microservice.hotel.application.usecases.EliminarHotelUseCase;
+import com.hotel.microservice.hotel.application.usecases.ListarHotelesUseCase;
+import com.hotel.microservice.hotel.application.usecases.ObtenerHotelUseCase;
 import com.hotel.microservice.reserva.application.inputports.CancelarReservaInputPort;
 import com.hotel.microservice.reserva.application.inputports.CheckInInputPort;
 import com.hotel.microservice.reserva.application.inputports.CheckOutInputPort;
@@ -40,9 +52,6 @@ import com.hotel.microservice.reserva.application.usecases.CheckOutUseCase;
 import com.hotel.microservice.reserva.application.usecases.CrearReservaUseCase;
 import com.hotel.microservice.reserva.application.usecases.ListarReservasUseCase;
 import com.hotel.microservice.reserva.application.usecases.ObtenerReservaUseCase;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class HotelMicroserviceApplication {
@@ -50,8 +59,6 @@ public class HotelMicroserviceApplication {
     public static void main(String[] args) {
         SpringApplication.run(HotelMicroserviceApplication.class, args);
     }
-
-    // ---- Wiring de casos de uso (public, no static, con retorno correcto) ----
     @Bean
     public CrearHotelInputPort crearHotel(HotelRepositorioPort repo) {
         return new CrearHotelUseCase(repo);
