@@ -1,14 +1,31 @@
 package com.hotel.microservice.hotel.infrastructure.inputadapters.rest;
 
-import com.hotel.microservice.hotel.application.inputports.*;
-import com.hotel.microservice.hotel.domain.Hotel;
-import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hotel.microservice.hotel.application.inputports.ActualizarHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.CrearHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.EliminarHotelInputPort;
+import com.hotel.microservice.hotel.application.inputports.ListarHotelesInputPort;
+import com.hotel.microservice.hotel.application.inputports.ObtenerHotelInputPort;
+import com.hotel.microservice.hotel.domain.Hotel;
+import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.ActualizarHotelRequest;
+import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.CrearHotelRequest;
+import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.HotelResponse;
+
+@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/hoteles")
 public class HotelControllerAdapter {

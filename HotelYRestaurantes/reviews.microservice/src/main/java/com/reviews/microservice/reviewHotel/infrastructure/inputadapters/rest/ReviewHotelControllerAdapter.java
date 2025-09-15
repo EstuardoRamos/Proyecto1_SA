@@ -30,7 +30,7 @@ import com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest.dt
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
-//@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+//@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reviews/hotel")
 //@CrossOrigin(origins = "*")

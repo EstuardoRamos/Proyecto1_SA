@@ -1,15 +1,28 @@
 package com.hotel.microservice.facturacion.infrastructure.inputadapters.rest;
 
-import com.hotel.microservice.common.errors.NotFoundException;
-import com.hotel.microservice.facturacion.application.inputports.*;
-import com.hotel.microservice.facturacion.infrastructure.inputadapters.rest.dto.*;
-import io.swagger.v3.oas.annotations.Operation;
-import java.time.Instant;
-import java.util.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import java.util.UUID;
 
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hotel.microservice.common.errors.NotFoundException;
+import com.hotel.microservice.facturacion.application.inputports.AnularFacturaHotelInputPort;
+import com.hotel.microservice.facturacion.application.inputports.EmitirFacturaHotelInputPort;
+import com.hotel.microservice.facturacion.application.inputports.ListarFacturasHotelInputPort;
+import com.hotel.microservice.facturacion.application.inputports.ObtenerFacturaHotelInputPort;
+import com.hotel.microservice.facturacion.infrastructure.inputadapters.rest.dto.EmitirFacturaHotelRequest;
+import com.hotel.microservice.facturacion.infrastructure.inputadapters.rest.dto.FacturaHotelResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+
+@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/facturas/hotel")
 @RequiredArgsConstructor

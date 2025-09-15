@@ -1,24 +1,38 @@
 package com.hotel.microservice.reserva.infrastructure.inputadapters.rest;
 
-import com.hotel.microservice.common.errors.NotFoundException;
-import com.hotel.microservice.reserva.application.inputports.*;
-import com.hotel.microservice.reserva.domain.Reserva;
-import com.hotel.microservice.reserva.infrastructure.inputadapters.rest.dto.*;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hotel.microservice.common.errors.NotFoundException;
+import com.hotel.microservice.reserva.application.inputports.CancelarReservaInputPort;
+import com.hotel.microservice.reserva.application.inputports.CheckInInputPort;
+import com.hotel.microservice.reserva.application.inputports.CheckOutInputPort;
+import com.hotel.microservice.reserva.application.inputports.CrearReservaInputPort;
+import com.hotel.microservice.reserva.application.inputports.ListarReservasInputPort;
+import com.hotel.microservice.reserva.application.inputports.ObtenerReservaInputPort;
+import com.hotel.microservice.reserva.domain.Reserva;
+import com.hotel.microservice.reserva.infrastructure.inputadapters.rest.dto.CrearReservaRequest;
+import com.hotel.microservice.reserva.infrastructure.inputadapters.rest.dto.ReservaResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import java.util.List;
+import jakarta.validation.Valid;
 
-import java.util.UUID;
-
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reservas")
 public class ReservaControllerAdapter {
