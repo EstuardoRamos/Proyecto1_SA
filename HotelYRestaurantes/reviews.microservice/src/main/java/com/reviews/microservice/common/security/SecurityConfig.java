@@ -15,6 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 //import org.springframework.web.cors.*;
 
 // reviews.microservice - SecurityConfig.java
+// SecurityConfig.java
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -22,29 +23,38 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
-      .csrf(csrf -> csrf.disable()) // <- importante para POST desde Postman/Front
-      //.cors(Customizer.withDefaults())
-      //.cors(cors -> cors.configurationSource(CorsConfigurationSource()))
-       .cors(c -> c.configurationSource(corsSource()))
+      .csrf(csrf -> csrf.disable())
+      .cors(c -> c.configurationSource(corsSource()))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
-        .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
-        .requestMatchers(HttpMethod.GET,  "/v1/reviews/**").permitAll()
-        .anyRequest().authenticated()
+          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // <- preflight
+          .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
+          .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
+          .requestMatchers(HttpMethod.GET,  "/v1/reviews/**").permitAll()
+          .anyRequest().authenticated()
       )
       .build();
   }
-  
-  private CorsConfigurationSource corsSource() {
-        var cfg = new CorsConfiguration();
-        cfg.setAllowedOrigins(List.of("*"));
-        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("*"));
-        cfg.setExposedHeaders(List.of("*"));
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", cfg);
-        return source;
-    }
-  
-  
+
+  @Bean
+  CorsConfigurationSource corsSource() {
+    CorsConfiguration cfg = new CorsConfiguration();
+
+    // 👇 Tu origen real (S3 website). Añade también localhost si pruebas local.
+    cfg.setAllowedOriginPatterns(List.of(
+      "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com",
+      "http://localhost:*",
+      "http://127.0.0.1:*"
+    ));
+    // Si NO usas cookies/sesión: no pongas allowCredentials o déjalo false (por defecto).
+    // Si usaras cookies: cfg.setAllowCredentials(true) y quita comodines.
+
+    cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+    cfg.setAllowedHeaders(List.of("*"));
+    cfg.setExposedHeaders(List.of("*"));
+    cfg.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", cfg);
+    return source;
+  }
 }
