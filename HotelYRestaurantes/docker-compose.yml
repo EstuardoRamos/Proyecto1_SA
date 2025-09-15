@@ -204,6 +204,8 @@ services:
       MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
       SPRINGDOC_SWAGGER_UI_URL: /api/reviews/v3/api-docs
       SPRINGDOC_SWAGGER_UI_CONFIG_URL: /api/reviews/v3/api-docs/swagger-config
+      #HOTEL_API_BASE_URL: http://hotel-app:8080
+      RESTAURANTE_API_BASE_URL: http://restaurante-app:8080
       SERVER_PORT: 8080
       # Base URL del MS Hotel para consultar facturas (usa service discovery via docker network)
       HOTEL_API_BASE_URL: http://hotel-app:8080
