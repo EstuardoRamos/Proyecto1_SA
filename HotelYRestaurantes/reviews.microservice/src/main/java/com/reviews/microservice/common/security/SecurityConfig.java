@@ -36,22 +36,23 @@ public class SecurityConfig {
   }
 
   @Bean
-  CorsConfigurationSource corsSource() {
-    CorsConfiguration cfg = new CorsConfiguration();
+CorsConfigurationSource corsSource() {
+  CorsConfiguration cfg = new CorsConfiguration();
 
-    cfg.setAllowedOriginPatterns(List.of(
-      "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
-    ));
-    // Si NO usas cookies/sesión: no pongas allowCredentials o déjalo false (por defecto).
-    // Si usaras cookies: cfg.setAllowCredentials(true) y quita comodines.
+  cfg.setAllowedOriginPatterns(List.of(
+    "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com",
+    "https://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
+  ));
+  // Si NO usas cookies/sesiones → NO pongas allowCredentials (dejar false).
+  // Si algún día usas cookies: cfg.setAllowCredentials(true) y entonces NO uses comodines.
 
-    cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-    cfg.setAllowedHeaders(List.of("*"));
-    cfg.setExposedHeaders(List.of("*"));
-    cfg.setMaxAge(3600L);
+  cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+  cfg.setAllowedHeaders(List.of("*"));
+  cfg.setExposedHeaders(List.of("*"));
+  cfg.setMaxAge(3600L);
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", cfg);
-    return source;
-  }
+  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  source.registerCorsConfiguration("/**", cfg);
+  return source;
+}
 }
