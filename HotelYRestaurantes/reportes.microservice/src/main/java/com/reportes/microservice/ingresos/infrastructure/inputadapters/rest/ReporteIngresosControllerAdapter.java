@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.*;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reportes/ingresos")
 public class ReporteIngresosControllerAdapter {
