@@ -20,39 +20,45 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+  // IMPORTANTE: usa el nombre estándar del bean
   @Bean
-  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http
-      .csrf(csrf -> csrf.disable())
-      .cors(c -> c.configurationSource(corsSource()))
-      .authorizeHttpRequests(auth -> auth
-          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // <- preflight
-          .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
-          .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
-          .requestMatchers(HttpMethod.GET,  "/v1/reviews/**").permitAll()
-          .anyRequest().authenticated()
-      )
-      .build();
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration cfg = new CorsConfiguration();
+
+    // Usa allowedOrigins (coincidencia exacta) para tu dominio de S3
+    cfg.setAllowedOrigins(List.of(
+      "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
+      // si llegas a servir por HTTPS añade también:
+      // "https://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
+    ));
+
+    // Si NO usas cookies/sesión, no actives credentials.
+    // Si algún día usas cookies, activa y quita comodines.
+    // cfg.setAllowCredentials(true);
+
+    cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+    cfg.setAllowedHeaders(List.of("*"));
+    cfg.setExposedHeaders(List.of("*"));
+    cfg.setMaxAge(3600L);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", cfg);
+    return source;
   }
 
   @Bean
-CorsConfigurationSource corsSource() {
-  CorsConfiguration cfg = new CorsConfiguration();
-
-  cfg.setAllowedOriginPatterns(List.of(
-    "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com",
-    "https://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
-  ));
-  // Si NO usas cookies/sesiones → NO pongas allowCredentials (dejar false).
-  // Si algún día usas cookies: cfg.setAllowCredentials(true) y entonces NO uses comodines.
-
-  cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-  cfg.setAllowedHeaders(List.of("*"));
-  cfg.setExposedHeaders(List.of("*"));
-  cfg.setMaxAge(3600L);
-
-  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-  source.registerCorsConfiguration("/**", cfg);
-  return source;
-}
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    return http
+      .csrf(csrf -> csrf.disable())
+      // usa el bean "corsConfigurationSource" anterior
+      .cors(Customizer.withDefaults())
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+        .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
+        .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
+        .requestMatchers(HttpMethod.GET, "/v1/reviews/**").permitAll()
+        .anyRequest().authenticated()
+      )
+      .build();
+  }
 }
