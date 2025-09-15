@@ -15,7 +15,7 @@ public class CorsConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration c = new CorsConfiguration();
     // ¡Un solo origen, no '*' si usas credenciales!
-    c.setAllowedOrigins(List.of("http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"));
+    c.setAllowedOrigins(List.of("*"));
     c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
     c.setAllowedHeaders(List.of("*"));          // acepta cualquier header (incl. Authorization, Content-Type)
     c.setAllowCredentials(true);

@@ -20,6 +20,7 @@ public class SecurityConfig {
     return http
       .csrf(csrf -> csrf.disable()) // <- importante para POST desde Postman/Front
       .cors(Customizer.withDefaults())
+      //.cors(cors -> cors.configurationSource(CorsConfigurationSource()))
       .authorizeHttpRequests(auth -> auth
         .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
         .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
