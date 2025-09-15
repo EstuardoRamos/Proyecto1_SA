@@ -25,7 +25,7 @@ import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.Actual
 import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.CrearHotelRequest;
 import com.hotel.microservice.hotel.infrastructure.inputadapters.rest.dto.HotelResponse;
 
-@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
+//@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/hoteles")
 public class HotelControllerAdapter {

@@ -22,7 +22,7 @@ import com.hotel.microservice.facturacion.infrastructure.inputadapters.rest.dto.
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
+//@CrossOrigin(origins = "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/facturas/hotel")
 @RequiredArgsConstructor
