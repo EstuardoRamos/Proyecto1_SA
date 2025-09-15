@@ -1,6 +1,7 @@
 // com.reviews.microservice.common.security.SecurityConfig
 package com.reviews.microservice.common.security;
 
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +9,9 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 //import org.springframework.web.cors.*;
 
 // reviews.microservice - SecurityConfig.java
@@ -19,8 +23,9 @@ public class SecurityConfig {
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
       .csrf(csrf -> csrf.disable()) // <- importante para POST desde Postman/Front
-      .cors(Customizer.withDefaults())
+      //.cors(Customizer.withDefaults())
       //.cors(cors -> cors.configurationSource(CorsConfigurationSource()))
+       .cors(c -> c.configurationSource(corsSource()))
       .authorizeHttpRequests(auth -> auth
         .requestMatchers("/actuator/**","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/error").permitAll()
         .requestMatchers(HttpMethod.POST, "/v1/reviews/hotel", "/v1/reviews/platillos").permitAll()
@@ -29,6 +34,17 @@ public class SecurityConfig {
       )
       .build();
   }
+  
+  private CorsConfigurationSource corsSource() {
+        var cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of("*"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setExposedHeaders(List.of("*"));
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
+    }
   
   
 }
