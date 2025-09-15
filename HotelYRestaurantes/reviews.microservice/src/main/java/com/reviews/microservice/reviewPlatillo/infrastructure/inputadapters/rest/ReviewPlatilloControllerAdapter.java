@@ -27,8 +27,8 @@ import com.reviews.microservice.reviewPlatillo.infrastructure.inputadapters.rest
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-//@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+//@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/v1/reviews/platillos")
 @RequiredArgsConstructor
