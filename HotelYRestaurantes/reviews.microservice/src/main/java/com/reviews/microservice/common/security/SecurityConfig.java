@@ -39,11 +39,8 @@ public class SecurityConfig {
   CorsConfigurationSource corsSource() {
     CorsConfiguration cfg = new CorsConfiguration();
 
-    // 👇 Tu origen real (S3 website). Añade también localhost si pruebas local.
     cfg.setAllowedOriginPatterns(List.of(
-      "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com",
-      "http://localhost:*",
-      "http://127.0.0.1:*"
+      "http://frontend-comerdormir.s3-website.us-east-2.amazonaws.com"
     ));
     // Si NO usas cookies/sesión: no pongas allowCredentials o déjalo false (por defecto).
     // Si usaras cookies: cfg.setAllowCredentials(true) y quita comodines.
