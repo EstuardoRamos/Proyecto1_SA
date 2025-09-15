@@ -238,6 +238,8 @@ services:
       # Swagger (ajusta si tu path cambia)
       SPRINGDOC_SWAGGER_UI_URL: /api/reportes/v3/api-docs
       SPRINGDOC_SWAGGER_UI_CONFIG_URL: /api/reportes/v3/api-docs/swagger-config
+      RESTAURANTE_API_BASE_URL: http://restaurante-app:8080
+      HOTEL_API_BASE_URL: http://hotel-app:8080
 
       # Puerto interno del contenedor (mantén 8080 si así corre tu app)
       SERVER_PORT: 8080
