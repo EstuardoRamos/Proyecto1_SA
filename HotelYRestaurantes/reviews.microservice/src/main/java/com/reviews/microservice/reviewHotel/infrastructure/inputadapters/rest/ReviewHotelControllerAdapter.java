@@ -1,17 +1,37 @@
 // infrastructure/inputadapters/rest/ReviewHotelControllerAdapter.java
 package com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest;
 
-import com.reviews.microservice.common.errors.NotFoundException;
-import com.reviews.microservice.reviewHotel.application.inputports.*;
-import com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest.dto.*;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.reviews.microservice.common.errors.NotFoundException;
+import com.reviews.microservice.reviewHotel.application.inputports.CrearReviewHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.DeshabilitarReviewHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.HabilitarReviewHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.ListarReviewsHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.ObtenerPromedioHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.ObtenerReviewHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.ResumenReviewsHotelInputPort;
+import com.reviews.microservice.reviewHotel.application.inputports.TopReviewsHotelInputPort;
+import com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest.dto.CrearReviewHotelRequest;
+import com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest.dto.PromedioResponse;
+import com.reviews.microservice.reviewHotel.infrastructure.inputadapters.rest.dto.ReviewHotelResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+
+//@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/v1/reviews/hotel")
 @CrossOrigin(origins = "*")
